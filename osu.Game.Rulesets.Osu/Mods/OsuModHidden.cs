@@ -4,16 +4,16 @@
 using System;
 using System.Diagnostics;
 using System.Linq;
-using osu.Framework.Graphics;
 using osu.Framework.Bindables;
+using osu.Framework.Graphics;
 using osu.Framework.Localisation;
-using osu.Game.Configuration;
 using osu.Game.Beatmaps;
+using osu.Game.Configuration;
 using osu.Game.Rulesets.Mods;
 using osu.Game.Rulesets.Objects;
 using osu.Game.Rulesets.Objects.Drawables;
-using osu.Game.Rulesets.Osu.Objects.Drawables;
 using osu.Game.Rulesets.Osu.Objects;
+using osu.Game.Rulesets.Osu.Objects.Drawables;
 using osu.Game.Rulesets.Osu.Skinning;
 
 namespace osu.Game.Rulesets.Osu.Mods
@@ -95,8 +95,7 @@ namespace osu.Game.Rulesets.Osu.Mods
 
                 case DrawableSliderRepeat sliderRepeat:
                     using (drawableObject.BeginAbsoluteSequence(fadeStartTime))
-                        // only apply to circle piece – reverse arrow is not affected by hidden.
-                        sliderRepeat.CirclePiece.FadeOut(fadeDuration);
+                        sliderRepeat.FadeOut(fadeDuration);
 
                     break;
 
@@ -145,11 +144,6 @@ namespace osu.Game.Rulesets.Osu.Mods
                     Debug.Assert(tail.Slider != null);
                     return getParameters(tail.Slider.HeadCircle);
 
-                case DrawableSliderRepeat repeat:
-                    // Use the same fade sequence as the slider head.
-                    Debug.Assert(repeat.Slider != null);
-                    return getParameters(repeat.Slider.HeadCircle);
-
                 default:
                     return getParameters(drawableObject.HitObject);
             }
@@ -166,6 +160,10 @@ namespace osu.Game.Rulesets.Osu.Mods
                 {
                     case Slider:
                         return (fadeOutStartTime, longFadeDuration);
+
+                    case SliderRepeat:
+                        // reverse arrows should disappear instead of fading
+                        return (hitObject.StartTime, 0);
 
                     case SliderTick:
                         double tickFadeOutDuration = Math.Min(hitObject.TimePreempt - DrawableSliderTick.ANIM_DURATION, 1000);
